@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { Link, useLocation } from 'react-router-dom';
 import {
     LayoutDashboard,
     FileCode,
@@ -11,19 +12,18 @@ import {
 } from 'lucide-react';
 import { Container } from '@portfolio/shared-ui';
 import { useAuth } from '../../hooks/useAuthHook';
-
-export type AdminView = 'OVERVIEW' | 'ENGINEERING' | 'PHOTOGRAPHY' | 'MEDIA' | 'SETTINGS';
+import { ConfirmDialog } from '../common/ConfirmDialog';
 
 interface SidebarItemProps {
     icon: React.ElementType;
     label: string;
+    to: string;
     active?: boolean;
-    onClick: () => void;
 }
 
-const SidebarItem: React.FC<SidebarItemProps> = ({ icon: Icon, label, active, onClick }) => (
-    <button
-        onClick={onClick}
+const SidebarItem: React.FC<SidebarItemProps> = ({ icon: Icon, label, to, active }) => (
+    <Link
+        to={to}
         className={`
     w-full flex items-center gap-4 px-4 py-3 rounded-xl transition-all group
     ${active
@@ -33,24 +33,39 @@ const SidebarItem: React.FC<SidebarItemProps> = ({ icon: Icon, label, active, on
         <Icon size={20} className={active ? 'text-accent-gold' : 'group-hover:scale-110 transition-transform'} />
         <span className="text-sm font-display font-medium tracking-tight">{label}</span>
         {active && <div className="ml-auto w-1.5 h-1.5 rounded-full bg-accent-gold shadow-[0_0_8px_rgba(212,175,55,1)]" />}
-    </button>
+    </Link>
 );
 
 interface DashboardLayoutProps {
     children: React.ReactNode;
-    currentView: AdminView;
-    onViewChange: (view: AdminView) => void;
 }
 
-export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, currentView, onViewChange }) => {
+export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
     const { logout } = useAuth();
+    const location = useLocation();
+    const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
+    const [isLoggingOut, setIsLoggingOut] = useState(false);
 
-    const viewTitleMap: Record<AdminView, string> = {
-        OVERVIEW: 'Platform Overview',
-        ENGINEERING: 'Engineering Data / Source',
-        PHOTOGRAPHY: 'Visual Assets / Curation',
-        MEDIA: 'Media Library / S3',
-        SETTINGS: 'System Configuration',
+    const handleLogout = async () => {
+        setIsLoggingOut(true);
+        try {
+            await logout();
+        } finally {
+            setIsLoggingOut(false);
+            setShowLogoutConfirm(false); // Only relevant if logout redirects instead of unmounting
+        }
+    };
+
+    const getViewTitle = () => {
+        const path = location.pathname;
+        if (path.includes('overview')) return 'Platform Overview';
+        if (path.includes('engineering')) return 'Engineering Data / Source';
+        if (path.includes('photography')) return 'Visual Assets / Curation';
+        if (path.includes('media')) return 'Media Library / S3';
+        if (path.includes('monitoring')) return 'System Monitoring';
+        if (path.includes('global-config')) return 'Global Configuration';
+        if (path.includes('profile')) return 'Master Profile';
+        return 'Admin Dashboard';
     };
 
     return (
@@ -64,18 +79,18 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, curr
 
                 <nav className="flex-1 space-y-2">
                     <div className="text-[10px] font-mono text-foreground/20 uppercase tracking-[0.3em] mb-4 ml-4">Main Menu</div>
-                    <SidebarItem icon={LayoutDashboard} label="Overview" active={currentView === 'OVERVIEW'} onClick={() => onViewChange('OVERVIEW')} />
-                    <SidebarItem icon={FileCode} label="Engineering Data" active={currentView === 'ENGINEERING'} onClick={() => onViewChange('ENGINEERING')} />
-                    <SidebarItem icon={ImageIcon} label="Photography Gallery" active={currentView === 'PHOTOGRAPHY'} onClick={() => onViewChange('PHOTOGRAPHY')} />
-                    <SidebarItem icon={ImageIcon} label="Media Library" active={currentView === 'MEDIA'} onClick={() => onViewChange('MEDIA')} />
+                    <SidebarItem to="/overview" icon={LayoutDashboard} label="Overview" active={location.pathname.includes('/overview')} />
+                    <SidebarItem to="/engineering" icon={FileCode} label="Engineering Data" active={location.pathname.includes('/engineering')} />
+                    <SidebarItem to="/photography" icon={ImageIcon} label="Photography Gallery" active={location.pathname.includes('/photography')} />
+                    <SidebarItem to="/media" icon={ImageIcon} label="Media Library" active={location.pathname.includes('/media')} />
 
                     <div className="pt-8 text-[10px] font-mono text-foreground/20 uppercase tracking-[0.3em] mb-4 ml-4">System</div>
-                    <SidebarItem icon={Activity} label="Monitoring" active={false} onClick={() => onViewChange('OVERVIEW')} />
-                    <SidebarItem icon={Settings} label="Global Settings" active={currentView === 'SETTINGS'} onClick={() => onViewChange('SETTINGS')} />
+                    <SidebarItem to="/monitoring" icon={Activity} label="Monitoring" active={location.pathname.includes('/monitoring')} />
+                    <SidebarItem to="/global-config" icon={Settings} label="Global Settings" active={location.pathname.includes('/global-config')} />
                 </nav>
 
                 <div className="mt-auto pt-6 border-t border-white/5 space-y-4">
-                    <div className="flex items-center gap-3 px-4 py-3">
+                    <Link to="/profile" className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${location.pathname.includes('/profile') ? 'bg-white/10' : 'hover:bg-white/5'}`}>
                         <div className="h-10 w-10 rounded-full bg-gradient-to-br from-accent-gold/50 to-white/10 flex items-center justify-center border border-white/10">
                             <User size={20} className="text-white" />
                         </div>
@@ -83,9 +98,9 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, curr
                             <p className="text-sm font-display font-bold text-white">Abhijeet V.</p>
                             <p className="text-[10px] font-mono text-foreground/40 uppercase tracking-widest">Master Admin</p>
                         </div>
-                    </div>
+                    </Link>
                     <button
-                        onClick={logout}
+                        onClick={() => setShowLogoutConfirm(true)}
                         className="w-full flex items-center gap-4 px-4 py-3 rounded-xl text-foreground/40 hover:text-red-400 hover:bg-red-400/5 transition-all group"
                     >
                         <LogOut size={20} className="group-hover:-translate-x-1 transition-transform" />
@@ -96,9 +111,20 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, curr
 
             {/* Main Content Area */}
             <div className="flex-1 flex flex-col h-screen overflow-hidden">
+                <ConfirmDialog
+                    isOpen={showLogoutConfirm}
+                    variant="danger"
+                    title="System Termination"
+                    message="You are about to securely terminate this session and sign out of the Admin node. Continue?"
+                    confirmLabel="Terminate Session"
+                    isLoading={isLoggingOut}
+                    onConfirm={handleLogout}
+                    onCancel={() => setShowLogoutConfirm(false)}
+                />
+
                 <header className="h-20 border-b border-white/5 flex items-center px-10 justify-between bg-black/10 backdrop-blur-sm">
                     <div className="flex items-center gap-4">
-                        <h2 className="text-2xl font-display font-bold text-white tracking-tight">{viewTitleMap[currentView]}</h2>
+                        <h2 className="text-2xl font-display font-bold text-white tracking-tight">{getViewTitle()}</h2>
                         <div className="h-1.5 w-1.5 rounded-full bg-green-500 animate-pulse" />
                         <span className="text-[10px] font-mono text-foreground/30 uppercase tracking-[0.2em]">Node-Alpha Active</span>
                     </div>

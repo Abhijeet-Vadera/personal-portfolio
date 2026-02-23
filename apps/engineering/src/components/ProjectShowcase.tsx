@@ -16,7 +16,7 @@ export const ProjectShowcase: React.FC = () => {
                 ease: 'power3.out',
                 scrollTrigger: {
                     trigger: containerRef.current,
-                    start: 'top 90%',
+                    start: 'top 95%',
                     once: true,
                 },
             });

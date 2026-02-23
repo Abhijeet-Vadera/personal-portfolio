@@ -1,14 +1,39 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Container, SmoothScroll } from '@portfolio/shared-ui'
 import { PhotographyHero } from './components/PhotographyHero'
 import { CategoryStory } from './components/CategoryStory'
 import { MasonryGallery } from './components/MasonryGallery'
 import { FullscreenViewer } from './components/FullscreenViewer'
-import { photographyData, Photo } from './data/photography'
-import { Camera, Image as ImageIcon } from 'lucide-react'
+import { Photo, Category } from './data/photography'
+import { Camera, Image as ImageIcon, Loader2 } from 'lucide-react'
 
 function App() {
     const [selectedPhoto, setSelectedPhoto] = useState<Photo | null>(null);
+    const [photographyData, setPhotographyData] = useState<Category[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+
+    useEffect(() => {
+        const fetchPhotographyData = async () => {
+            try {
+                const API_URL = (import.meta as any).env.VITE_API_URL;
+                if (!API_URL) throw new Error("API URL not configured");
+
+                const response = await fetch(`${API_URL}/content?key=photography.json`);
+                if (!response.ok) throw new Error("Failed to fetch photography data");
+
+                const data = await response.json();
+                setPhotographyData(data);
+            } catch (err: any) {
+                console.error("Error loading photography data:", err);
+                setError(err.message || "Failed to load archive");
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        fetchPhotographyData();
+    }, []);
 
     const allPhotos = photographyData.flatMap(cat => cat.photos);
 
@@ -56,15 +81,27 @@ function App() {
                     <PhotographyHero />
 
                     {/* Narrative Sections */}
-                    {photographyData.map((category, index) => (
-                        <React.Fragment key={category.id}>
-                            <CategoryStory category={category} inverse={index % 2 !== 0} />
-                            <MasonryGallery
-                                photos={category.photos}
-                                onPhotoClick={(photo) => setSelectedPhoto(photo)}
-                            />
-                        </React.Fragment>
-                    ))}
+                    {isLoading ? (
+                        <div className="py-40 flex flex-col items-center justify-center gap-4">
+                            <Loader2 size={32} className="text-white/20 animate-spin" />
+                            <p className="text-[10px] font-mono tracking-[0.3em] text-foreground/40 uppercase">Loading Archive Volume...</p>
+                        </div>
+                    ) : error ? (
+                        <div className="py-40 flex flex-col items-center justify-center gap-4">
+                            <p className="text-[10px] font-mono tracking-[0.3em] text-red-400 uppercase">Archive Error</p>
+                            <p className="text-sm font-mono text-foreground/40">{error}</p>
+                        </div>
+                    ) : (
+                        photographyData.map((category, index) => (
+                            <React.Fragment key={category.id}>
+                                <CategoryStory category={category} inverse={index % 2 !== 0} />
+                                <MasonryGallery
+                                    photos={category.photos}
+                                    onPhotoClick={(photo) => setSelectedPhoto(photo)}
+                                />
+                            </React.Fragment>
+                        ))
+                    )}
 
                     {/* Final Narrative CTA */}
                     <section className="py-40 bg-white/[0.02]">

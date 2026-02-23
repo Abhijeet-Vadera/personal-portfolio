@@ -35,7 +35,9 @@ resource "aws_iam_policy" "lambda_s3_dynamo" {
         Effect   = "Allow"
         Resource = [
             aws_s3_bucket.media.arn,
-            "${aws_s3_bucket.media.arn}/*"
+            "${aws_s3_bucket.media.arn}/*",
+            aws_s3_bucket.content.arn,
+            "${aws_s3_bucket.content.arn}/*"
         ]
       }
     ]
@@ -57,14 +59,15 @@ resource "aws_lambda_function" "content_handler" {
   filename         = data.archive_file.lambda_zip.output_path
   function_name    = "${var.project_name}-content-handler"
   role             = aws_iam_role.lambda_exec.arn
-  handler          = "index.handler"
+  handler          = "content_handler.lambda_handler"
   source_code_hash = data.archive_file.lambda_zip.output_base64sha256
-  runtime          = "nodejs20.x"
+  runtime          = "python3.10"
   timeout          = 10
 
   environment {
     variables = {
-      MEDIA_BUCKET = aws_s3_bucket.media.id
+      MEDIA_BUCKET   = aws_s3_bucket.media.id
+      CONTENT_BUCKET = aws_s3_bucket.content.id
     }
   }
 }

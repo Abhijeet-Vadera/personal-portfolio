@@ -9,7 +9,8 @@ import { Download, Terminal } from 'lucide-react'
 
 function App() {
     const handleDownloadCV = () => {
-        window.print();
+        // Ideally this domain should come from env vars, hardcoding for now based on outputs
+        window.open('https://abhijeet-portfolio-media.s3.amazonaws.com/uploads/resume.pdf', '_blank');
     };
 
     return (

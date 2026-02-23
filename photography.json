@@ -1,0 +1,16 @@
+[
+  {
+    "id": "gallery-1",
+    "title": "Uploaded Media",
+    "description": "Recent uploads from the media library.",
+    "coverImage": "https://abhijeet-portfolio-media.s3.us-east-1.amazonaws.com/uploads/images__6_.jpeg",
+    "photos": [
+      {
+        "id": "photo-1",
+        "url": "https://abhijeet-portfolio-media.s3.us-east-1.amazonaws.com/uploads/images__6_.jpeg",
+        "alt": "Uploaded image",
+        "aspectRatio": "square"
+      }
+    ]
+  }
+]

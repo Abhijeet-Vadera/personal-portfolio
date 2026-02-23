@@ -24,7 +24,7 @@ def get_response(status_code, body):
             'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
             'Access-Control-Allow-Methods': 'GET,POST,PUT,DELETE,OPTIONS'
         },
-        'body': json.dumps(body) if isinstance(body, dict) else body
+        'body': json.dumps(body) if isinstance(body, (dict, list)) else body
     }
 
 def lambda_handler(event, context):
@@ -77,7 +77,40 @@ def lambda_handler(event, context):
                     ExpiresIn=3600
                 )
                 
-                return get_response(200, {'uploadUrl': presigned_url, 'key': file_name})
+                return get_response(200, {'uploadUrl': presigned_url, 'key': f"uploads/{file_name}"})
+
+        elif path == "/media/list":
+            if http_method == "GET":
+                try:
+                    # List objects with prefix 'uploads/'
+                    response = s3.list_objects_v2(Bucket=MEDIA_BUCKET, Prefix='uploads/')
+                    items = []
+                    if 'Contents' in response:
+                        for obj in response['Contents']:
+                            if obj['Key'] != 'uploads/': # ignore the folder itself if it exists
+                                items.append({
+                                    'key': obj['Key'],
+                                    'size': obj['Size'],
+                                    'lastModified': obj['LastModified'].isoformat(),
+                                    # Note: ContentType requires a separate HeadObject call
+                                    # which is slow for lists. We'll default to 'image/*' in JS
+                                    'contentType': 'image/*' 
+                                })
+                    # Sort by newest first
+                    items.sort(key=lambda x: x['lastModified'], reverse=True)
+                    return get_response(200, items)
+                except Exception as e:
+                    print(f"Error listing media: {str(e)}")
+                    return get_response(500, {'error': 'Failed to list media objects'})
+                    
+        elif path == "/media":
+            if http_method == "DELETE":
+                key = event.get('queryStringParameters', {}).get('key')
+                if not key or not is_safe_path(key) or not key.startswith('uploads/'):
+                    return get_response(400, {'error': 'Invalid key for deletion'})
+                    
+                s3.delete_object(Bucket=MEDIA_BUCKET, Key=key)
+                return get_response(200, {'message': 'Media deleted successfully'})
 
         return get_response(404, {'error': 'Not Found'})
 

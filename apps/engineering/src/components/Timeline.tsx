@@ -1,17 +1,44 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { gsap } from '@portfolio/config-animations';
-import { timelineData } from '../data/timeline';
+import { TimelineEvent } from '../data/timeline';
 
 export const Timeline: React.FC = () => {
     const containerRef = useRef<HTMLDivElement>(null);
+    const [timelineData, setTimelineData] = useState<TimelineEvent[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
+        const fetchTimeline = async () => {
+            try {
+                const API_URL = import.meta.env.VITE_API_URL;
+                if (!API_URL) throw new Error("API URL not configured");
+
+                const response = await fetch(`${API_URL}/content?key=timeline.json`);
+                if (!response.ok) throw new Error("Failed to fetch timeline data");
+
+                const data = await response.json();
+                setTimelineData(data);
+            } catch (err: any) {
+                console.error("Error loading timeline:", err);
+                setError(err.message || "Failed to load timeline");
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        fetchTimeline();
+    }, []);
+
+    useEffect(() => {
+        if (isLoading || timelineData.length === 0) return;
+
         const ctx = gsap.context(() => {
             timelineData.forEach((_, index) => {
                 const tl = gsap.timeline({
                     scrollTrigger: {
                         trigger: `.tl-item-${index}`,
-                        start: 'top 88%',
+                        start: 'top 95%',
                         once: true,
                     },
                 });
@@ -31,7 +58,25 @@ export const Timeline: React.FC = () => {
         }, containerRef);
 
         return () => ctx.revert();
-    }, []);
+    }, [isLoading, timelineData]);
+
+    if (isLoading) {
+        return (
+            <div className="ml-[72px] py-10 flex flex-col items-center justify-center gap-4">
+                <div className="h-6 w-6 border-2 border-accent-gold/20 border-t-accent-gold rounded-full animate-spin" />
+                <p className="text-[10px] font-mono tracking-[0.3em] text-foreground/40 uppercase">Loading Timeline...</p>
+            </div>
+        );
+    }
+
+    if (error) {
+        return (
+            <div className="ml-[72px] py-10 flex flex-col items-center justify-center gap-4">
+                <p className="text-[10px] font-mono tracking-[0.3em] text-red-400 uppercase">Load Error</p>
+                <p className="text-sm font-mono text-foreground/40">{error}</p>
+            </div>
+        );
+    }
 
     return (
         <div ref={containerRef} className="ml-[72px]">

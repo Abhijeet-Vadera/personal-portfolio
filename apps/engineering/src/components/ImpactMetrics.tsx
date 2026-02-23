@@ -21,7 +21,7 @@ export const ImpactMetrics: React.FC = () => {
                 ease: 'power3.out',
                 scrollTrigger: {
                     trigger: ref.current,
-                    start: 'top 88%',
+                    start: 'top 95%',
                     once: true,
                 },
             });

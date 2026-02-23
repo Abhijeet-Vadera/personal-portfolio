@@ -1,0 +1,16 @@
+[
+  {
+    "year": "2026",
+    "title": "Senior Software Architect",
+    "company": "Tech Corp",
+    "description": "Architected cloud-native solutions using serverless architecture and React frontend.",
+    "tech": ["React", "AWS Lambda", "Terraform"]
+  },
+  {
+    "year": "2023",
+    "title": "Lead Engineer",
+    "company": "Startup Inc",
+    "description": "Led a team of 5 engineers to deliver a global SaaS platform.",
+    "tech": ["Node.js", "PostgreSQL", "Next.js"]
+  }
+]
