@@ -1,0 +1,9 @@
+{
+  "name": "@portfolio/config-prettier",
+  "version": "0.0.0",
+  "private": true,
+  "main": "index.json",
+  "devDependencies": {
+    "typescript": "^5.9.3"
+  }
+}

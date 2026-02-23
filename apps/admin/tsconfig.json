@@ -1,0 +1,23 @@
+{
+    "extends": "../../tsconfig.json",
+    "compilerOptions": {
+        "outDir": "dist/types",
+        "baseUrl": ".",
+        "paths": {
+            "@portfolio/shared-ui": [
+                "../../packages/shared-ui"
+            ]
+        }
+    },
+    "include": [
+        "src"
+    ],
+    "references": [
+        {
+            "path": "./tsconfig.node.json"
+        },
+        {
+            "path": "../../packages/shared-ui"
+        }
+    ]
+}

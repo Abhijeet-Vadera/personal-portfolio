@@ -1,0 +1,10 @@
+
+You are building a cinematic but professional portfolio platform.
+
+Strictly follow:
+- Modular architecture
+- Monorepo structure
+- Dynamic imports for heavy libs
+- Strict TypeScript
+- Clean Tailwind utility usage
+- No inline styles

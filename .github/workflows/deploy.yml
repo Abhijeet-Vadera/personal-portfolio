@@ -1,0 +1,54 @@
+name: Deploy Portfolio Platform
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Install pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 10
+          
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'pnpm'
+          
+      - name: Install dependencies
+        run: pnpm install
+        
+      - name: Build all apps
+        run: pnpm build
+        
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+          
+      - name: Deploy Gateway
+        run: aws s3 sync apps/gateway/dist s3://abhijeet-portfolio-gateway --delete
+        
+      - name: Deploy Engineering
+        run: aws s3 sync apps/engineering/dist s3://abhijeet-portfolio-engineering --delete
+        
+      - name: Deploy Photography
+        run: aws s3 sync apps/photography/dist s3://abhijeet-portfolio-photography --delete
+        
+      - name: Deploy Admin
+        run: aws s3 sync apps/admin/dist s3://abhijeet-portfolio-admin --delete
+        
+      - name: Invalidate CloudFront Cache
+        run: |
+          aws cloudfront create-invalidation --distribution-id ${{ secrets.CLOUDFRONT_GATEWAY_ID }} --paths "/*"
+          aws cloudfront create-invalidation --distribution-id ${{ secrets.CLOUDFRONT_ENGINEERING_ID }} --paths "/*"
+          aws cloudfront create-invalidation --distribution-id ${{ secrets.CLOUDFRONT_PHOTOGRAPHY_ID }} --paths "/*"
+          aws cloudfront create-invalidation --distribution-id ${{ secrets.CLOUDFRONT_ADMIN_ID }} --paths "/*"

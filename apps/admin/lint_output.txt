@@ -1,0 +1,22 @@
+
+/home/abhijeet/workspace/my/abhijeet-portfolio-platform-blueprint/apps/admin/src/hooks/useAuth.tsx
+  35:13  error    Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+/home/abhijeet/workspace/my/abhijeet-portfolio-platform-blueprint/apps/admin/src/hooks/useAuth.tsx:35:13
+  33 |             return () => clearTimeout(timer);
+  34 |         } else {
+> 35 |             setState(prev => ({ ...prev, isLoading: false }));
+     |             ^^^^^^^^ Avoid calling setState() directly within an effect
+  36 |         }
+  37 |         return undefined;
+  38 |     }, []);  react-hooks/set-state-in-effect
+  86:14  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      react-refresh/only-export-components
+
+✖ 2 problems (1 error, 1 warning)
+

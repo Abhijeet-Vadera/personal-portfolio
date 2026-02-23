@@ -1,0 +1,23 @@
+{
+  "name": "@portfolio/config-animations",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "tsc"
+  },
+  "main": "dist/index.js",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "peerDependencies": {
+    "framer-motion": ">=10",
+    "gsap": ">=3.12",
+    "lenis": ">=1.0"
+  },
+  "dependencies": {
+    "@studio-freight/lenis": "^1.0.42"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.3"
+  }
+}

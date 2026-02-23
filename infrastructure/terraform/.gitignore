@@ -1,0 +1,26 @@
+# ── Terraform state (contains real infrastructure IDs and secrets) ─────────────
+terraform.tfstate
+terraform.tfstate.backup
+terraform.tfstate.*.backup
+
+# ── Terraform plan (may contain sensitive values in plaintext) ────────────────
+tfplan
+*.tfplan
+
+# ── Terraform working directory ───────────────────────────────────────────────
+.terraform/
+.terraform.lock.hcl
+
+# ── Variable files (may contain secrets) ─────────────────────────────────────
+*.tfvars
+*.tfvars.json
+
+# ── Override files ────────────────────────────────────────────────────────────
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# ── Lambda deployment package (rebuild from source, don't commit binary) ──────
+lambda_function.zip
+*.zip

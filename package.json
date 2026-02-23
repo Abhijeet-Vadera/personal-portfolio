@@ -1,0 +1,25 @@
+{
+  "name": "portfolio-platform",
+  "private": true,
+  "scripts": {
+    "dev": "turbo dev",
+    "build": "turbo build",
+    "lint": "turbo lint",
+    "ai:build": "echo 'AI Build pipeline starting...'",
+    "deploy": "./scripts/deploy.sh all",
+    "deploy:gateway": "./scripts/deploy.sh gateway",
+    "deploy:engineering": "./scripts/deploy.sh engineering",
+    "deploy:photography": "./scripts/deploy.sh photography",
+    "deploy:admin": "./scripts/deploy.sh admin"
+  },
+  "devDependencies": {
+    "turbo": "latest"
+  },
+  "packageManager": "pnpm@10.15.0",
+  "pnpm": {
+    "overrides": {
+      "framer-motion": "10.18.0",
+      "motion-utils": "10.16.2"
+    }
+  }
+}

@@ -1,0 +1,23 @@
+{
+    "extends": "../../tsconfig.json",
+    "compilerOptions": {
+        "baseUrl": ".",
+        "outDir": "dist",
+        "paths": {
+            "@portfolio/config-tailwind": [
+                "../config-tailwind"
+            ],
+            "@portfolio/config-animations": [
+                "../config-animations"
+            ]
+        }
+    },
+    "include": [
+        "."
+    ],
+    "references": [
+        {
+            "path": "../config-animations"
+        }
+    ]
+}
