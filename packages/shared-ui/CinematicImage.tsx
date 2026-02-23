@@ -32,7 +32,7 @@ export const CinematicImage: React.FC<CinematicImageProps> = ({
     return (
         <div className={cn(
             "relative overflow-hidden bg-white/5",
-            aspectRatios[aspectRatio],
+            aspectRatios[aspectRatio as keyof typeof aspectRatios],
             className
         )}>
             {/* Placeholder / Blur-up effect */}

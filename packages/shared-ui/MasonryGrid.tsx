@@ -17,7 +17,7 @@ interface MasonryGridProps {
 export const MasonryGrid: React.FC<MasonryGridProps> = ({
     children,
     className,
-    columns = { default: 1, sm: 2, md: 3, lg: 4 },
+    columns = { default: 1, sm: 2, md: 3, lg: 4, xl: 4 },
     gap = 6,
 }) => {
     // Using CSS columns for a traditional masonry overlap or grid for structured masonry
@@ -50,7 +50,7 @@ export const MasonryGrid: React.FC<MasonryGridProps> = ({
         }
       `}} />
             <div className="masonry-grid">
-                {React.Children.map(children, (child) => (
+                {React.Children.map(children, (child: React.ReactNode) => (
                     <div className="masonry-item">
                         {child}
                     </div>
