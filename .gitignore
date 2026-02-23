@@ -20,9 +20,12 @@ out/
 .env.staging
 .env.*.local
 
+# ── act local workflow runner ─────────────────────────────────────────────────
+.secrets
+
 # ── AWS credentials & exports ─────────────────────────────────────────────────
-aws-exports.js
-aws-exports.ts
+# Note: aws-exports.ts is intentionally NOT ignored — it only reads from
+# VITE_* env vars and contains no secrets. Real secrets stay in .env.production
 .aws/
 *.pem
 *.key
